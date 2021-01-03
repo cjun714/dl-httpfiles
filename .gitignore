@@ -88,3 +88,4 @@ GTAGS
 *.bmp
 config.ini
 *.html
+!example.html
