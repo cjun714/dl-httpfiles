@@ -26,11 +26,24 @@ func get(site, url, dirName string) error {
 
 	resp, e := http.Get(url)
 	if e != nil {
-		return nil
+		i := 0
+		for i < 3 { // retry 3 times
+			resp, e = http.Get(url)
+			if e == nil {
+				break
+			}
+			i++
+		}
+		if i == 3 {
+			return e
+		}
 	}
 	defer resp.Body.Close()
 
 	doc, e := goquery.NewDocumentFromReader(resp.Body)
+	if e != nil {
+		return e
+	}
 	doc.Find("li").Each(func(i int, s *goquery.Selection) {
 		l, _ := s.Find("a").Attr("href")
 		fName := s.Text()
