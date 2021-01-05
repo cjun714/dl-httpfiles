@@ -13,10 +13,10 @@ func main() {
 	url := os.Args[1]
 	site := getSiteName(url)
 
-	get(site, url, "/")
+	getList(site, url, "/")
 }
 
-func get(site, url, dirName string) error {
+func getList(site, url, dirName string) error {
 	fmt.Println("Dir:", dirName)
 
 	// if not a full path, then add site to url
@@ -55,7 +55,7 @@ func get(site, url, dirName string) error {
 
 		if exist && typ == "circle" {
 			subDirName := dirName + fName + "/"
-			get(site, l, subDirName)
+			getList(site, l, subDirName)
 		} else {
 			fmt.Println("File:", fName)
 			fmt.Println(site + l)
