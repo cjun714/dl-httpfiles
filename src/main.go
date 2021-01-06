@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -13,14 +14,17 @@ func main() {
 	url := os.Args[1]
 	site := getSiteName(url)
 
-	getList(site, url, "/")
+	e := getList(site, url, "/")
+	if e != nil {
+		log.Fatal(e)
+	}
 }
 
 func getList(site, url, dirName string) error {
 	fmt.Println("Dir:", dirName)
 
 	// if not a full path, then add site to url
-	if strings.Index(url, "http://") == -1 {
+	if !strings.Contains(url, "http://") {
 		url = site + url
 	}
 
@@ -45,7 +49,7 @@ func getList(site, url, dirName string) error {
 		return e
 	}
 	doc.Find("li").Each(func(i int, s *goquery.Selection) {
-		l, _ := s.Find("a").Attr("href")
+		link, _ := s.Find("a").Attr("href")
 		fName := s.Text()
 		typ, exist := s.Attr("type")
 
@@ -55,10 +59,13 @@ func getList(site, url, dirName string) error {
 
 		if exist && typ == "circle" {
 			subDirName := dirName + fName + "/"
-			getList(site, l, subDirName)
+			e := getList(site, link, subDirName)
+			if e != nil {
+				log.Println("get list failed: ", url, ". ", e)
+			}
 		} else {
 			fmt.Println("File:", fName)
-			fmt.Println(site + l)
+			fmt.Println(site + link[1:])
 		}
 	})
 
